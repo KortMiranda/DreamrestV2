@@ -6,25 +6,35 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Icon from './icon';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Input from './Input'
+import useStyles from './styles';
+import Input from './Input';
+import { signin, signup } from '../../actions/auth';
 
-import useStyles from './styles'
+const initialState = { firstName: '', lastName: '', email: '', password: '', }
 
 const Auth = () => {
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
+    const [formData, setFormData] = useState(initialState);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleShowPassword = () => setShowPassword((prevShowPassword) => !prevShowPassword);
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if(isSignUp) {
+            dispatch(signup(formData, navigate))
+        } else {
+            dispatch(signin(formData, navigate))
 
+        }
     };
 
-    const handleChange = () => {
-
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const switchMode = () => {
@@ -47,25 +57,6 @@ const Auth = () => {
        }
     }; 
     
-
-    // const handleCallbackResponse = (response) => {
-    //     console.log("Encoded JWT ID token: " + response.credential);
-    //     var userObject = jwt_decode(response.credential)
-    //     console.log(userObject)
-    // }
-
-    // useEffect(() => {
-    //     /* global google */
-    //     google.accounts.id.initialize({
-    //         client_id: "278248019764-d0epbfo26lofk4ppcet5c222hqk8jc4e.apps.googleusercontent.com",
-    //         callback: handleCallbackResponse
-    //     });
-
-    //     google.accounts.id.renderButton(
-    //         document.getElementById("signInDiv"),
-    //         { theme: "outline", size: "large"}
-    //     );
-    // }, [])
 
     const googleFailure = (error) => {
         console.log(error)
@@ -96,21 +87,7 @@ const Auth = () => {
                 <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
                     {isSignUp ? 'Sign Up' : 'Sign In'}
                 </Button>
-                <GoogleLogin 
-                    // id="signInDiv"
-                    // clientId="278248019764-d0epbfo26lofk4ppcet5c222hqk8jc4e.apps.googleusercontent.com"
-                    // render={(renderProps) => (
-                    //     <Button className={classes.googleButton} color='primary' fullWidth onClick={renderProps.onClick} disabled={renderProps.disabled} startIcon={<Icon />} variant="contained">
-                    //       Google Sign In  
-                    //     </Button>
-                    // )}
-                    onSuccess={googleSuccess}
-                    // onSuccess={credentialResponse => {
-                    //     console.log(credentialResponse)
-                    // }}
-                    onFailure={googleFailure}
-                    // cookiePolicy="single_host_origin"
-                />
+                <GoogleLogin onSuccess={googleSuccess} onFailure={googleFailure} />
                 <Grid container justifyContent="flex-end">
                     <Grid item>
                         <Button onClick={switchMode}>
