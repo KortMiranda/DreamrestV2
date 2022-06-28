@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Avatar, Button, Paper, Grid, Typography, Container } from '@material-ui/core';
-// import { GoogleLogin } from 'react-google-login';
 import { GoogleLogin } from '@react-oauth/google';
 import jwt_decode from 'jwt-decode';
 import { useDispatch } from 'react-redux';
@@ -15,7 +14,6 @@ const Auth = () => {
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
-    // const [user, setUser] = useState()
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -36,20 +34,19 @@ const Auth = () => {
 
     const googleSuccess = async (credentialResponse) => {
         console.log(credentialResponse)
-        var userObject = jwt_decode(credentialResponse.credential)
-    
-    //    console.log(userObject)
-    //    const token = res?.tokenId;
+        var userObject = jwt_decode(credentialResponse?.credential)
+        console.log(userObject)
 
        try {
            dispatch({ type: 'AUTH', data: { userObject} });
            console.log(userObject)
 
-        //    navigate.push('/')
+           navigate('/')
        } catch (error) {
            console.log(error)
        }
     }; 
+    
 
     // const handleCallbackResponse = (response) => {
     //     console.log("Encoded JWT ID token: " + response.credential);
@@ -99,7 +96,6 @@ const Auth = () => {
                 <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
                     {isSignUp ? 'Sign Up' : 'Sign In'}
                 </Button>
-                {/* <div id="signInDiv"></div> */}
                 <GoogleLogin 
                     // id="signInDiv"
                     // clientId="278248019764-d0epbfo26lofk4ppcet5c222hqk8jc4e.apps.googleusercontent.com"
@@ -114,7 +110,6 @@ const Auth = () => {
                     // }}
                     onFailure={googleFailure}
                     // cookiePolicy="single_host_origin"
-                    // plugin_name="DreamrestV2"
                 />
                 <Grid container justifyContent="flex-end">
                     <Grid item>
