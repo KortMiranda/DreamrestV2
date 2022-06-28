@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Avatar, Button, Paper, Grid, Typography, Container } from '@material-ui/core';
-import { GoogleLogin } from 'react-google-login';
-
+// import { GoogleLogin } from 'react-google-login';
+import { GoogleLogin } from '@react-oauth/google';
+import jwt_decode from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Icon from './icon';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Input from './Input'
@@ -11,8 +14,10 @@ import useStyles from './styles'
 const Auth = () => {
     const classes = useStyles();
     const [showPassword, setShowPassword] = useState(false);
-    const [isSignUp, setIsSignUp] = useState(false)
-
+    const [isSignUp, setIsSignUp] = useState(false);
+    // const [user, setUser] = useState()
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleShowPassword = () => setShowPassword((prevShowPassword) => !prevShowPassword);
 
@@ -29,11 +34,44 @@ const Auth = () => {
         handleShowPassword(false);
     }
 
-    const googleSuccess = (res) => {
-        console.log(res)
+    const googleSuccess = async (credentialResponse) => {
+        console.log(credentialResponse)
+        var userObject = jwt_decode(credentialResponse.credential)
+    
+    //    console.log(userObject)
+    //    const token = res?.tokenId;
+
+       try {
+           dispatch({ type: 'AUTH', data: { userObject} });
+           console.log(userObject)
+
+        //    navigate.push('/')
+       } catch (error) {
+           console.log(error)
+       }
     }; 
 
-    const googleFailure = () => {
+    // const handleCallbackResponse = (response) => {
+    //     console.log("Encoded JWT ID token: " + response.credential);
+    //     var userObject = jwt_decode(response.credential)
+    //     console.log(userObject)
+    // }
+
+    // useEffect(() => {
+    //     /* global google */
+    //     google.accounts.id.initialize({
+    //         client_id: "278248019764-d0epbfo26lofk4ppcet5c222hqk8jc4e.apps.googleusercontent.com",
+    //         callback: handleCallbackResponse
+    //     });
+
+    //     google.accounts.id.renderButton(
+    //         document.getElementById("signInDiv"),
+    //         { theme: "outline", size: "large"}
+    //     );
+    // }, [])
+
+    const googleFailure = (error) => {
+        console.log(error)
         console.log("Google Sign In was unsuccessful. Try Again Later");
     };
 
@@ -58,21 +96,27 @@ const Auth = () => {
                     <Input name="password" label="Password" handleChange={handleChange} type={showPassword ? "text" : "password"} handleShowPassword={handleShowPassword}/>
                     { isSignUp && <Input name="confirmPassword" label="Repeat Password" handleChange={handleChange} type="password" />}
                 </Grid>
-                <GoogleLogin 
-                    clientId="884881715579-373ttato9qhjl17oetm0f7tmehirv0rc.apps.googleusercontent.com"
-                    render={(renderProps) => (
-                        <Button className={classes.googleButton} color='primary' fullWidth onClick={renderProps.onClick} disabled={renderProps.disabled} startIcon={<Icon />} variant="contained">
-                          Google Sign In  
-                        </Button>
-                    )}
-                    onSuccess={googleSuccess}
-                    onFailure={googleFailure}
-                    cookiePolicy="single_host_origin"
-                />
                 <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
                     {isSignUp ? 'Sign Up' : 'Sign In'}
                 </Button>
-                <Grid container justify="flex-end">
+                {/* <div id="signInDiv"></div> */}
+                <GoogleLogin 
+                    // id="signInDiv"
+                    // clientId="278248019764-d0epbfo26lofk4ppcet5c222hqk8jc4e.apps.googleusercontent.com"
+                    // render={(renderProps) => (
+                    //     <Button className={classes.googleButton} color='primary' fullWidth onClick={renderProps.onClick} disabled={renderProps.disabled} startIcon={<Icon />} variant="contained">
+                    //       Google Sign In  
+                    //     </Button>
+                    // )}
+                    onSuccess={googleSuccess}
+                    // onSuccess={credentialResponse => {
+                    //     console.log(credentialResponse)
+                    // }}
+                    onFailure={googleFailure}
+                    // cookiePolicy="single_host_origin"
+                    // plugin_name="DreamrestV2"
+                />
+                <Grid container justifyContent="flex-end">
                     <Grid item>
                         <Button onClick={switchMode}>
                             { isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
