@@ -13,15 +13,21 @@ import { signin, signup } from '../../actions/auth';
 const initialState = { firstName: '', lastName: '', email: '', password: '', }
 
 const Auth = () => {
-    const classes = useStyles();
-    const [showPassword, setShowPassword] = useState(false);
-    const [isSignUp, setIsSignUp] = useState(false);
     const [formData, setFormData] = useState(initialState);
+    const [isSignUp, setIsSignUp] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
+    const classes = useStyles();
+    
+    const [showPassword, setShowPassword] = useState(false);
     const handleShowPassword = () => setShowPassword((prevShowPassword) => !prevShowPassword);
-
+    
+    const switchMode = () => {
+        setFormData(initialState);
+        setIsSignUp((prevIsSignUp) => !prevIsSignUp);
+        setShowPassword(false);
+    }
+    
     const handleSubmit = (e) => {
         e.preventDefault();
         
@@ -32,15 +38,6 @@ const Auth = () => {
 
         }
     };
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const switchMode = () => {
-        setIsSignUp((prevIsSignUp) => !prevIsSignUp);
-        handleShowPassword(false);
-    }
 
     const googleSuccess = async (credentialResponse) => {
         console.log(credentialResponse)
@@ -57,12 +54,16 @@ const Auth = () => {
        }
     }; 
     
-
     const googleFailure = (error) => {
         console.log(error)
         console.log("Google Sign In was unsuccessful. Try Again Later");
     };
+    
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
+    
   return (
     <Container component="main" maxWidth="xs">
         <Paper className={classes.paper} elevation={3}>
