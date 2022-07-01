@@ -1,5 +1,8 @@
+import express from 'express';
 import mongoose from "mongoose";
 import PostMessage from "../models/postMessage.js";
+
+const router = express.Router();
 
 export const getPosts = async (req, res) => {
     try {
@@ -49,7 +52,15 @@ export const deletePost = async (req, res) => {
 }
 
 export const likePost = async (req, res) => {
+
+    // res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+    // if (isPreflight(req)) {
+    //     res.set('Access-Control-Allow-Methods', 'U')
+    // }
+    
     const { id } = req.params;
+
+    console.log(id)
 
     if(!req.userId) return res.json({ message: 'Unauthenticated' });
 
@@ -69,5 +80,7 @@ export const likePost = async (req, res) => {
 
     const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true})
 
-    res.json(updatedPost);
+    res.status(200).json(updatedPost);
 }
+
+export default router;
